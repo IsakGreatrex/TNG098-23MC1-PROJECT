@@ -16,10 +16,15 @@
             <button id="toggleControls">≡</button>
         </div>
         <div class="controls-content">
+            <button id="resetView" style="margin-bottom:10px;">Reset</button>
+            <input type="text" id="nodeSearchInput" placeholder="Search" style="width:100%;margin-top:8px;">
             <div class="data-controls">
                 <h4>Data Amount</h4>
                 <input type="range" id="nodeCountSlider" min="50" max="3721" step="50" value="100">
                 <span id="nodeCount">100 nodes</span>
+                <div style="font-size: 0.95em; color: #555; margin-top: 2px;">
+                    The nodes shown are the <b>top N most connected</b> (highest degree) entities in the dataset. Increasing the slider reveals more nodes, starting with those that have the most relationships.
+                </div>
             </div>
             <div class="filter-sections">
                 <div class="filter-group">
@@ -33,6 +38,7 @@
                         <label><input type="checkbox" value="event" checked> Event</label>
                         <label><input type="checkbox" value="movement" checked> Movement</label>
                         <label><input type="checkbox" value="political_organization" checked> Political Org</label>
+                        <label><input type="checkbox" value="other" checked> Other</label>
                     </div>
                 </div>
                 <div class="filter-group">

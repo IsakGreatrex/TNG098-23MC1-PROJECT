@@ -74,7 +74,7 @@ const nodeColors = {
 let allNodes = [];
 let allLinks = [];
 let nodeNeighborsCache = new Map();
-let currentChunkSize = 100;
+let currentChunkSize = 500;
 const quadtree = d3.quadtree();
 
 async function loadData() {
@@ -176,9 +176,24 @@ function updateVisualization() {
         Array.from(document.querySelectorAll('.edge-filters input:checked'))
             .map(cb => cb.value)
     );
-    const filteredNodes = currentNodes.filter(node => 
-        !node.type || activeNodeTypes.has(node.type)
-    );
+    // Get search query (case-insensitive, trimmed)
+    const searchInput = document.getElementById('nodeSearchInput');
+    const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    // Updated node filtering logic to support 'other' type and search
+    const filteredNodes = currentNodes.filter(node => {
+        // Node type filter
+        const typeOk = (!node.type || !(node.type in nodeColors))
+            ? activeNodeTypes.has('other')
+            : activeNodeTypes.has(node.type);
+        // Search filter (id, country, dataset, etc.)
+        if (searchQuery) {
+            // Match id, country, dataset, or any string property
+            const props = [node.id, node.country, node.dataset, node.type];
+            const match = props.some(p => typeof p === 'string' && p.toLowerCase().includes(searchQuery));
+            if (!match) return false;
+        }
+        return typeOk;
+    });
     const nodeIds = new Set(filteredNodes.map(n => n.id));
     const filteredLinks = currentLinks.filter(link =>
         (!link.type || activeEdgeTypes.has(link.type)) &&
@@ -199,7 +214,18 @@ function updateVisualization() {
             .on('end', dragended));
     // Node size: proportional to importance (number of links)
     nodeEnter.append('circle')
-        .attr('r', d => 10 + Math.sqrt(d.neighbors || 1) * 2)
+        .attr('r', d => {
+            // Use logarithmic scaling for node size
+            const minR = 10;
+            const maxR = 40;
+            const base = 1 + (d.neighbors || 1);
+            // Log scale, normalized to [minR, maxR]
+            const logVal = Math.log(base);
+            // Find max log(neighbors) in currentNodes for normalization
+            const maxLog = Math.max(...filteredNodes.map(n => Math.log(1 + (n.neighbors || 1))));
+            const scaled = minR + (maxR - minR) * (logVal / (maxLog || 1));
+            return scaled;
+        })
         .attr('fill', d => nodeColors[d.type] || '#999');
     nodeEnter.append('text')
         .attr('dx', 12)
@@ -360,6 +386,19 @@ function setupEventHandlers() {
             document.getElementById('nodeCount').textContent = `${count} nodes`;
             updateChunkSize(count);
         });
+    }
+    // Add reset button handler
+    const resetButton = document.getElementById('resetView');
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            window.location.reload(true);
+        });
+    }
+
+    // Node search input
+    const nodeSearchInput = document.getElementById('nodeSearchInput');
+    if (nodeSearchInput) {
+        nodeSearchInput.addEventListener('input', debounce(updateVisualization, 200));
     }
 }
 
