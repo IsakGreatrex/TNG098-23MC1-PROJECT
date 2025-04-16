@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishEye Network Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div id="network"></div>
+    
+    <div class="overlay controls-overlay">
+        <div class="controls-header">
+            <h1>FishEye Network Analysis</h1>
+            <button id="toggleControls">≡</button>
+        </div>
+        <div class="controls-content">
+            <div class="data-controls">
+                <h4>Data Amount</h4>
+                <input type="range" id="nodeCountSlider" min="50" max="3721" step="50" value="100">
+                <span id="nodeCount">100 nodes</span>
+            </div>
+            <div class="filter-sections">
+                <div class="filter-group">
+                    <h4>Node Types</h4>
+                    <div class="filters node-filters">
+                        <label><input type="checkbox" value="company" checked> Company</label>
+                        <label><input type="checkbox" value="organization" checked> Organization</label>
+                        <label><input type="checkbox" value="person" checked> Person</label>
+                        <label><input type="checkbox" value="vessel" checked> Vessel</label>
+                        <label><input type="checkbox" value="location" checked> Location</label>
+                        <label><input type="checkbox" value="event" checked> Event</label>
+                        <label><input type="checkbox" value="movement" checked> Movement</label>
+                        <label><input type="checkbox" value="political_organization" checked> Political Org</label>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h4>Link Types</h4>
+                    <div class="filters edge-filters">
+                        <label><input type="checkbox" value="membership" checked> Membership</label>
+                        <label><input type="checkbox" value="partnership" checked> Partnership</label>
+                        <label><input type="checkbox" value="ownership" checked> Ownership</label>
+                        <label><input type="checkbox" value="family_relationship" checked> Family Relationship</label>
+                        <label><input type="checkbox" value="default" checked> Other</label>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-section">
+                <h4>Node Color Legend</h4>
+                <ul class="color-legend">
+                    <li><span class="legend-circle" style="background-color:#ff7f0e"></span> Company</li>
+                    <li><span class="legend-circle" style="background-color:#1f77b4"></span> Organization</li>
+                    <li><span class="legend-circle" style="background-color:#2ca02c"></span> Person</li>
+                    <li><span class="legend-circle" style="background-color:#d62728"></span> Vessel</li>
+                    <li><span class="legend-circle" style="background-color:#9467bd"></span> Location</li>
+                    <li><span class="legend-circle" style="background-color:#8c564b"></span> Event</li>
+                    <li><span class="legend-circle" style="background-color:#e377c2"></span> Movement</li>
+                    <li><span class="legend-circle" style="background-color:#7f7f7f"></span> Political Organization</li>
+                </ul>
+                <h4>Link Color Legend</h4>
+                <ul class="color-legend">
+                    <li><span class="legend-line" style="background-color:#1f77b4"></span> Membership</li>
+                    <li><span class="legend-line" style="background-color:#ff7f0e"></span> Partnership</li>
+                    <li><span class="legend-line" style="background-color:#2ca02c"></span> Ownership</li>
+                    <li><span class="legend-line" style="background-color:#d62728"></span> Family Relationship</li>
+                    <li><span class="legend-line" style="background-color:#999"></span> Other</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay details-overlay">
+        <div class="details-header">
+            <h2>Entity Details</h2>
+            <button id="closeDetails">×</button>
+        </div>
+        <div class="details-content">
+            <div id="entityInfo">
+                <p>Select a node to see details</p>
+            </div>
+            <div id="connectionInfo">
+                <h3>Connected Entities</h3>
+                <ul id="connectionsList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

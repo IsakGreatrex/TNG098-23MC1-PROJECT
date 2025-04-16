@@ -1,0 +1,25 @@
+Analysts at FishEye International are committed to stopping illegal, unreported, and unregulated (IUU) fishing and protecting marine species that are affected by it. As part of their work, FishEye collects online news articles about fishing, marine industry, and international maritime trade. To facilitate their analysis, FishEye uses a natural language processing tool to extract the names of entities (people and businesses) and the relationships between them. The extracted information is transformed into a knowledge graph that analysts would like to use to investigate illegal fishing. One of FishEye’s tasks is investigating tips they receive about possible IUU involvement. To push their investigations forward, FishEye’s analysts need to quickly see, understand, and explore the context around each tip. If they can connect an entity identified in a tip to illegal fishing, they may be able to escalate their investigation. Helpfully, FishEye has included some of their own illegal fishing case studies in the database so the organization and the companies they have investigated appear in the graph.
+
+However, simply showing all information related to a suspected entity will be overwhelming, especially when using a traditional node-link visualization to see context around neighboring entities. Your task is to use visual analytics to help FishEye analysts see, interact with, and understand the context around a tip. Special emphasis should be placed on displaying relevant contextual information and hiding information that is not interesting or relevant. Ideally, the display will be dynamic and interactive. Using visual analytics, can you help FishEye identify companies that could be engaged in illegal fishing?
+
+VAST 2023 MC1 Data Notes
+Data dictionary and nodes for MC1:
+Graph Description: The challenge problem KG is generated using Natural Language Processing (NLP) tools extracting entities and relationships from a set of text articles.
+• 3721 nodes
+• 7422 edges
+• Possible Node types are: {person, organization, company, political_organization, location, vessel, event, movement}
+• Possible Edge types are: {membership, partnership, ownership, family_relationship}
+• This is a directed multi-graph, so multiple edges between the same two nodes are possible
+• The graph format is a json format intended to match d3's node-link format and be compatible with networkx.node_link_graph. At the root-level, it is a dictionary with graph-level properties specified as keys ( directed , mulitgraph , graph ). The nodes and links keys each provide a dictionary of the nodes and links respectively. The nodes entries that must include an id key that is unique for each node. The links entries include source and target keys that refer to node id values. All other keys provided in node and link dictionaries are attributes for that node or link.
+Node Attributes:
+• Id – Identifier of the node is also usually the name of the entity. Some nodes have a numeric ID and do not have a name even if they are a person, company, or organization.
+• type—Type of the node as defined above. It is an optional attribute
+• country—Country associated with the entity. It is an optional attribute.
+• dataset – Always ‘MC1’
+Edge Attributes:    
+• source – ID of the source node
+• target – ID of the target node
+• type – Type of the edge as defined above. It is an optional attribute
+• dataset – Always ‘MC1’
+ 
+Note: all names included in this dataset are fictional. Any resemblance to real persons, companies, or locations are purely coincidental.
