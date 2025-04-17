@@ -93,7 +93,7 @@ button:hover {
 
 #resetView {
     background: #607d8b;
-    background: #007bff;
+    background: #ee2222;
     color: white;
     margin-right: 8px;
 }
@@ -517,6 +517,33 @@ svg {
 #connectionsList li {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
+}
+
+/* Reset Warning Popup */
+#resetWarningPopup {
+    display: none;
+    position: absolute;
+    left: 110px;
+    top: 0;
+    background: #fffbe6;
+    color: #b71c1c;
+    border: 1.5px solid #ee2222;
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 1em;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    z-index: 2000;
+    min-width: 260px;
+    max-width: 320px;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.reset-warning-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 /* Responsive Design */

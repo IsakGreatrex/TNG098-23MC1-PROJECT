@@ -1,3 +1,6 @@
+//https://vast-challenge.github.io/2023/MC1.html
+//
+
 // Initialize visualization parameters
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -272,7 +275,11 @@ function updateVisualization() {
     // Update simulation
     simulation.nodes(filteredNodes);
     simulation.force('link').links(linksToShow);
-    simulation.alpha(0.2).restart();
+    // Robustly reheat simulation for full re-layout after node/link changes
+    simulation.alpha(1).restart();
+    // Optionally, set alphaTarget for a smoother effect
+    simulation.alphaTarget(0.3);
+    setTimeout(() => simulation.alphaTarget(0), 500);
 }
 
 function handleNodeClick(event, d) {
@@ -390,8 +397,12 @@ function setupEventHandlers() {
     // Add reset button handler
     const resetButton = document.getElementById('resetView');
     if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            window.location.reload(true);
+        resetButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const confirmed = window.confirm('This will reset all your progress and reload the site. Are you sure you want to continue?');
+            if (confirmed) {
+                window.location.reload(true);
+            }
         });
     }
 
@@ -399,6 +410,26 @@ function setupEventHandlers() {
     const nodeSearchInput = document.getElementById('nodeSearchInput');
     if (nodeSearchInput) {
         nodeSearchInput.addEventListener('input', debounce(updateVisualization, 200));
+    }
+
+    // Add compact layout button handler
+    const compactLayoutButton = document.getElementById('compactLayout');
+    if (compactLayoutButton) {
+        compactLayoutButton.addEventListener('click', () => {
+            // Strongly pull nodes to the center
+            simulation.force('x', d3.forceX(width / 2).strength(2));
+            simulation.force('y', d3.forceY(height / 2).strength(2));
+            simulation.force('charge').strength(-200); // Keep some repulsion to avoid overlap
+            simulation.alpha(1).restart();
+            simulation.alphaTarget(0.6);
+            setTimeout(() => {
+                // Restore to default after 1.2s
+                simulation.force('x', null);
+                simulation.force('y', null);
+                simulation.force('charge').strength(d => Math.min(-50, -10 - d.neighbors * 2));
+                simulation.alphaTarget(0);
+            }, 1200);
+        });
     }
 }
 

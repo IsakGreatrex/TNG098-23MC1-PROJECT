@@ -16,11 +16,17 @@
             <button id="toggleControls">≡</button>
         </div>
         <div class="controls-content">
-            <button id="resetView" style="margin-bottom:10px;">Reset</button>
+            <button id="resetView" style="margin-bottom:10px;" title="This will reset all your progress and reload the site.">Reset ⚠️</button>
+            <div id="resetWarningPopup" style="display:none; position:absolute; z-index:2000;">
+                <div class="reset-warning-content">
+                    <strong>Warning:</strong> This will reset all your progress and reload the site.
+                </div>
+            </div>
+            <button id="compactLayout" style="margin-bottom:10px;">Compact Layout</button>
             <input type="text" id="nodeSearchInput" placeholder="Search" style="width:100%;margin-top:8px;">
             <div class="data-controls">
                 <h4>Data Amount</h4>
-                <input type="range" id="nodeCountSlider" min="50" max="3721" step="50" value="100">
+                <input type="range" id="nodeCountSlider" min="50" max="3750" step="50" value="100">
                 <span id="nodeCount">100 nodes</span>
                 <div style="font-size: 0.95em; color: #555; margin-top: 2px;">
                     The nodes shown are the <b>top N most connected</b> (highest degree) entities in the dataset. Increasing the slider reveals more nodes, starting with those that have the most relationships.
