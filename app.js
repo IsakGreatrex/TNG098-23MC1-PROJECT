@@ -1,5 +1,5 @@
 //https://vast-challenge.github.io/2023/MC1.html
-//
+//test 3 simon commit
 
 // Initialize visualization parameters
 const width = window.innerWidth;
