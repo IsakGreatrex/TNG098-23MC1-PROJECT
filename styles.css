@@ -569,6 +569,15 @@ svg {
     gap: 10px;
 }
 
+/* Make items in the side menu clickable with a pointer cursor */
+.connection-item {
+    cursor: pointer;
+}
+
+.connection-item:hover {
+    text-decoration: underline; /* Optional: Add underline on hover for better visibility */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .controls-overlay {

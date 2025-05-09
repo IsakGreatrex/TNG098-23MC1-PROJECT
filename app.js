@@ -463,10 +463,11 @@ function dragended(event) {
     event.subject.fy = null;
 }
 
+// Update the `updateEntityDetails` function to make connections clickable
 function updateEntityDetails(entity) {
     const details = document.getElementById('entityInfo');
     const connections = document.getElementById('connectionsList');
-    
+
     details.innerHTML = `
         <h3>${entity.id}</h3>
         <p>Type: ${entity.type || 'N/A'}</p>
@@ -484,13 +485,26 @@ function updateEntityDetails(entity) {
         const connectedEntity = isSource ? link.target : link.source;
         const relationship = link.type || 'connected to';
         return `
-            <li>
+            <li class="connection-item" data-node-id="${connectedEntity.id}">
                 ${isSource ? 'Has' : 'Is in'} ${relationship} with 
                 <strong>${connectedEntity.id}</strong> 
                 (${connectedEntity.type || 'unknown type'})
             </li>
         `;
     }).join('');
+
+    // Add click event listeners to connection items
+    document.querySelectorAll('.connection-item').forEach(item => {
+        item.addEventListener('click', (event) => {
+            const nodeId = event.currentTarget.getAttribute('data-node-id');
+            const selectedNode = allNodes.find(node => node.id === nodeId);
+            if (selectedNode) {
+                selectedNodes = [selectedNode]; // Update selected nodes
+                updateVisualization(); // Update the graph view
+                updateEntityDetails(selectedNode); // Update the details panel
+            }
+        });
+    });
 }
 
 // Optimize force simulation
