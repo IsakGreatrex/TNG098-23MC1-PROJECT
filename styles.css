@@ -60,6 +60,26 @@ header {
     margin-bottom: 10px;
 }
 
+/* Enhance the search bar styling */
+#nodeSearchInput {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    border: 2px solid #007bff; /* Add a blue border */
+    border-radius: 8px; /* Round the corners */
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 14px; /* Increase font size */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+}
+
+#nodeSearchInput:focus {
+    border-color: #0056b3; /* Darker blue on focus */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhance shadow on focus */
+    outline: none; /* Remove default outline */
+}
+
 button {
     padding: 0.5rem 1rem;
     background: #4a5568;
@@ -243,16 +263,19 @@ button:hover {
     stroke-width: 2px;
 }
 
+/* Increase font size and improve visibility of node text on hover */
 .node text {
-    font-size: 8px;
+    font-size: 12px; /* Increase default font size */
     pointer-events: none;
     paint-order: stroke;
     fill: #333;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, font-size 0.2s; /* Add smooth transition */
 }
 
 .node:hover text {
     opacity: 1 !important;
+    font-size: 14px; /* Further increase font size on hover */
+    font-weight: bold; /* Make text bold for better visibility */
 }
 
 .link {

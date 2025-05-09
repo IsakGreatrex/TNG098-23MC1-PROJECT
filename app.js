@@ -17,7 +17,14 @@ const g = svg.append('g');
 svg.call(d3.zoom()
     .scaleExtent([0.1, 4])
     .filter(() => true) // Always allow zoom
-    .on('zoom', (event) => g.attr('transform', event.transform))
+    .on('zoom', (event) => {
+        g.attr('transform', event.transform);
+        // Scale node text size dynamically based on zoom level
+        const scale = event.transform.k;
+        nodeElements.select('text')
+            .style('font-size', `${12 / scale}px`) // Adjust font size inversely to zoom level
+            .style('stroke-width', `${0.5 / scale}px`); // Adjust stroke width for clarity
+    })
 );
 
 // Add SVG background click to clear selection
@@ -230,9 +237,10 @@ function updateVisualization() {
             return scaled;
         })
         .attr('fill', d => nodeColors[d.type] || '#999');
+    // Ensure node text is appended after the circle to appear above
     nodeEnter.append('text')
-        .attr('dx', 12)
-        .attr('dy', '.35em')
+        .attr('dx', 0) // Center the text horizontally
+        .attr('dy', -10) // Position the text above the node
         .text(d => d.id)
         .style('font-size', '10px')
         .style('opacity', 0)
@@ -366,9 +374,10 @@ function updateVisualization() {
             return scaled;
         })
         .attr('fill', d => nodeColors[d.type] || '#999');
+    // Ensure node text is appended after the circle to appear above
     nodeEnter.append('text')
-        .attr('dx', 12)
-        .attr('dy', '.35em')
+        .attr('dx', 0) // Center the text horizontally
+        .attr('dy', -10) // Position the text above the node
         .text(d => d.id)
         .style('font-size', '10px')
         .style('opacity', 0)

@@ -98,6 +98,37 @@
         </div>
     </div>
 
+    <!-- Update the info icon to make it larger -->
+    <div id="info-icon" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info-circle">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </div>
+
+    <!-- Add a tooltip or modal for the info icon -->
+    <div id="info-tooltip" style="display: none; position: absolute; top: 40px; right: 10px; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <p style="margin: 0; font-size: 14px;">Hold <strong>Shift</strong> and click on nodes to select multiple nodes</p>
+    </div>
+
     <script src="app.js"></script>
+    <script>
+        // Add interactivity for the info icon
+        const infoIcon = document.getElementById('info-icon');
+        const infoTooltip = document.getElementById('info-tooltip');
+
+        infoIcon.addEventListener('click', () => {
+            const isVisible = infoTooltip.style.display === 'block';
+            infoTooltip.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close tooltip when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!infoIcon.contains(event.target) && !infoTooltip.contains(event.target)) {
+                infoTooltip.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
