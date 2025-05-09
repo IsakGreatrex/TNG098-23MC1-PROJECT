@@ -24,8 +24,8 @@ svg.call(d3.zoom()
 svg.on('click', function(event) {
     // Only reset if the click target is the SVG itself (not a node or link)
     if (event.target === this) {
+        selectedNodes = []; // Clear all selected nodes
         resetHighlight();
-        selectedNode = null;
         document.querySelector('.details-overlay').classList.remove('show');
     }
 });
@@ -282,11 +282,145 @@ function updateVisualization() {
     setTimeout(() => simulation.alphaTarget(0), 500);
 }
 
+// Add global variable to track multiple selected nodes
+let selectedNodes = [];
+
+// Modify handleNodeClick to support multi-selection
 function handleNodeClick(event, d) {
-    selectedNode = d;
+    if (event.shiftKey) {
+        // Add or remove node from selection
+        const index = selectedNodes.findIndex(node => node.id === d.id);
+        if (index === -1) {
+            selectedNodes.push(d);
+        } else {
+            selectedNodes.splice(index, 1);
+        }
+    } else {
+        // Single selection (clear previous selection)
+        selectedNodes = [d];
+    }
     updateVisualization();
     updateEntityDetails(d);
     document.querySelector('.details-overlay').classList.add('show');
+}
+
+// Update updateVisualization to handle multiple selected nodes
+function updateVisualization() {
+    // Filter data
+    const activeNodeTypes = new Set(
+        Array.from(document.querySelectorAll('.node-filters input:checked'))
+            .map(cb => cb.value)
+    );
+    const activeEdgeTypes = new Set(
+        Array.from(document.querySelectorAll('.edge-filters input:checked'))
+            .map(cb => cb.value)
+    );
+    // Get search query (case-insensitive, trimmed)
+    const searchInput = document.getElementById('nodeSearchInput');
+    const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    // Updated node filtering logic to support 'other' type and search
+    const filteredNodes = currentNodes.filter(node => {
+        // Node type filter
+        const typeOk = (!node.type || !(node.type in nodeColors))
+            ? activeNodeTypes.has('other')
+            : activeNodeTypes.has(node.type);
+        // Search filter (id, country, dataset, etc.)
+        if (searchQuery) {
+            // Match id, country, dataset, or any string property
+            const props = [node.id, node.country, node.dataset, node.type];
+            const match = props.some(p => typeof p === 'string' && p.toLowerCase().includes(searchQuery));
+            if (!match) return false;
+        }
+        return typeOk;
+    });
+    const nodeIds = new Set(filteredNodes.map(n => n.id));
+    const filteredLinks = currentLinks.filter(link =>
+        (!link.type || activeEdgeTypes.has(link.type)) &&
+        nodeIds.has(link.source.id) &&
+        nodeIds.has(link.target.id)
+    );
+
+    // Always show all nodes
+    nodeElements = g.selectAll('.node')
+        .data(filteredNodes, d => d.id);
+    nodeElements.exit().remove();
+    const nodeEnter = nodeElements.enter()
+        .append('g')
+        .attr('class', 'node')
+        .call(d3.drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended));
+    // Node size: proportional to importance (number of links)
+    nodeEnter.append('circle')
+        .attr('r', d => {
+            // Use logarithmic scaling for node size
+            const minR = 10;
+            const maxR = 40;
+            const base = 1 + (d.neighbors || 1);
+            // Log scale, normalized to [minR, maxR]
+            const logVal = Math.log(base);
+            // Find max log(neighbors) in currentNodes for normalization
+            const maxLog = Math.max(...filteredNodes.map(n => Math.log(1 + (n.neighbors || 1))));
+            const scaled = minR + (maxR - minR) * (logVal / (maxLog || 1));
+            return scaled;
+        })
+        .attr('fill', d => nodeColors[d.type] || '#999');
+    nodeEnter.append('text')
+        .attr('dx', 12)
+        .attr('dy', '.35em')
+        .text(d => d.id)
+        .style('font-size', '10px')
+        .style('opacity', 0)
+        .style('pointer-events', 'none');
+    nodeElements = nodeEnter.merge(nodeElements);
+    nodeElements.on('click', handleNodeClick);
+
+    // Highlight links and nodes for all selected nodes
+    let linksToShow = [];
+    if (selectedNodes.length > 0) {
+        const neighborIds = new Set(selectedNodes.map(node => node.id));
+        selectedNodes.forEach(node => {
+            currentLinks.forEach(link => {
+                if (link.source.id === node.id || link.target.id === node.id) {
+                    linksToShow.push(link);
+                    neighborIds.add(link.source.id);
+                    neighborIds.add(link.target.id);
+                }
+            });
+        });
+
+        nodeElements.select('circle')
+            .style('opacity', d => neighborIds.has(d.id) ? 1 : 0.2)
+            .style('stroke', d => neighborIds.has(d.id) ? '#222' : '#fff')
+            .style('stroke-width', d => neighborIds.has(d.id) ? 4 : 1.5);
+    } else {
+        nodeElements.select('circle')
+            .style('opacity', 1)
+            .style('stroke', '#fff')
+            .style('stroke-width', 1.5);
+    }
+
+    linkElements = g.selectAll('.link')
+        .data(linksToShow);
+    linkElements.exit().remove();
+    const linkEnter = linkElements.enter()
+        .append('line')
+        .attr('class', 'link')
+        .attr('stroke', getLinkColor);
+    linkElements = linkEnter.merge(linkElements);
+
+    // Update simulation
+    simulation.nodes(filteredNodes);
+    simulation.force('link').links(linksToShow);
+    simulation.alpha(1).restart();
+}
+
+// Add a function to clear all selections
+function clearSelection() {
+    selectedNodes = [];
+    updateVisualization();
+    document.querySelector('.details-overlay').classList.remove('show');
 }
 
 function resetHighlight() {
