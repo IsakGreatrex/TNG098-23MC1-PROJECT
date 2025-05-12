@@ -20,11 +20,16 @@ This project is an interactive network visualization tool for exploring the VAST
 - `VAST 2023 MC1 Data Notes.docx` — Additional data notes/documentation.
 
 ## Usage
-1. Open `index.html` in a modern web browser (Chrome, Firefox, Edge, Safari).
-2. Use the controls on the left to filter, search, and adjust the visualization.
-3. Click nodes to view details and connections.
-4. Use the "Compact Layout" button to cluster nodes by connectivity.
-5. Use the "Reset" button to reload and reset the visualization.
+1. Open a terminal and navigate to the project directory.
+2. Run the following command to start a local server:
+   ```bash
+   python3 -m http.server
+   ```
+3. Open a web browser and go to `http://localhost:8000`.
+4. Use the controls on the left to filter, search, and adjust the visualization.
+5. Click nodes to view details and connections.
+6. Use the "Compact Layout" button to cluster nodes by connectivity.
+7. Use the "Reset" button to reload and reset the visualization.
 
 ## Requirements
 - No installation required. All dependencies are loaded via CDN (D3.js).
