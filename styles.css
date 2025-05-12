@@ -578,6 +578,25 @@ svg {
     text-decoration: underline; /* Optional: Add underline on hover for better visibility */
 }
 
+/* Ensure buttons for close and minimize are styled and visible */
+.node-menu button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #333; /* Ensure visibility */
+    padding: 5px;
+    margin: 0;
+}
+
+.node-menu button:hover {
+    color: #000; /* Darker color on hover */
+}
+
+.node-menu button:focus {
+    outline: none; /* Remove focus outline */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .controls-overlay {

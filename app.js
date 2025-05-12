@@ -293,9 +293,148 @@ function updateVisualization() {
 // Add global variable to track multiple selected nodes
 let selectedNodes = [];
 
+// Function to create a new menu for each selected node with full details and movable functionality
+function createNodeMenu(node) {
+    // Check if a menu for this node already exists
+    if (document.getElementById(`menu-${node.id}`)) return;
+
+    // Create a new menu container
+    const menu = document.createElement('div');
+    menu.id = `menu-${node.id}`;
+    menu.className = 'node-menu';
+    menu.style.position = 'absolute';
+    menu.style.top = `${window.innerHeight / 2 - 150}px`; // Center vertically
+    menu.style.left = `${window.innerWidth / 2 - 150}px`; // Center horizontally
+    menu.style.width = '300px';
+    menu.style.height = '400px'; // Fixed height for scrollability
+    menu.style.background = 'white';
+    menu.style.border = '1px solid #ddd';
+    menu.style.borderRadius = '8px';
+    menu.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+    menu.style.padding = '10px';
+    menu.style.zIndex = 1000;
+    menu.style.overflowY = 'auto'; // Enable vertical scrolling
+
+    // Add header with close and minimize button
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '10px';
+    header.style.cursor = 'move'; // Make it draggable
+
+    const title = document.createElement('h4');
+    title.textContent = `Node: ${node.id}`;
+    title.style.margin = '0';
+
+    const buttonContainer = document.createElement('div');
+
+    // Update the minimize functionality to hide the entire menu content, including the background
+    const minimizeButton = document.createElement('button');
+    minimizeButton.textContent = '—'; // Line for minimize
+    minimizeButton.style.background = 'none';
+    minimizeButton.style.border = 'none';
+    minimizeButton.style.fontSize = '16px';
+    minimizeButton.style.cursor = 'pointer';
+    minimizeButton.style.marginRight = '5px';
+    minimizeButton.addEventListener('click', () => {
+        const isMinimized = menu.classList.toggle('minimized');
+        const content = menu.querySelector('.menu-content');
+        if (isMinimized) {
+            menu.style.height = '30px'; // Reduce height to show only the header
+            content.style.display = 'none'; // Hide the content
+        } else {
+            menu.style.height = '400px'; // Restore full height
+            content.style.display = 'block'; // Show the content
+        }
+    });
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×'; // X for close
+    closeButton.style.background = 'none';
+    closeButton.style.border = 'none';
+    closeButton.style.fontSize = '16px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.addEventListener('click', () => {
+        menu.remove(); // Remove the menu from the DOM
+    });
+
+    buttonContainer.appendChild(minimizeButton);
+    buttonContainer.appendChild(closeButton);
+
+    header.appendChild(title);
+    header.appendChild(buttonContainer);
+    menu.appendChild(header);
+
+    // Add node details and connections
+    const content = document.createElement('div');
+    content.className = 'menu-content';
+    content.innerHTML = `
+        <p>Type: ${node.type || 'N/A'}</p>
+        <p>Country: ${node.country || 'N/A'}</p>
+        <p>Dataset: ${node.dataset || 'N/A'}</p>
+        <p>Connections: ${node.neighbors}</p>
+        <h4>Connected Entities</h4>
+        <ul>
+            ${currentLinks.filter(link => link.source.id === node.id || link.target.id === node.id).map(link => {
+                const isSource = link.source.id === node.id;
+                const connectedEntity = isSource ? link.target : link.source;
+                const relationship = link.type || 'connected to';
+                return `
+                    <li class="connection-item" data-node-id="${connectedEntity.id}">
+                        ${isSource ? 'Has' : 'Is in'} ${relationship} with 
+                        <strong>${connectedEntity.id}</strong> 
+                        (${connectedEntity.type || 'unknown type'})
+                    </li>
+                `;
+            }).join('')}
+        </ul>
+    `;
+    menu.appendChild(content);
+
+    // Add click event listeners to connection items
+    content.querySelectorAll('.connection-item').forEach(item => {
+        item.addEventListener('click', (event) => {
+            const nodeId = event.currentTarget.getAttribute('data-node-id');
+            const selectedNode = allNodes.find(node => node.id === nodeId);
+            if (selectedNode) {
+                createNodeMenu(selectedNode); // Open a new menu for the clicked node
+            }
+        });
+    });
+
+    // Make the menu draggable
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - menu.offsetLeft;
+        offsetY = e.clientY - menu.offsetTop;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+
+    function onMouseMove(e) {
+        if (isDragging) {
+            menu.style.left = `${e.clientX - offsetX}px`;
+            menu.style.top = `${e.clientY - offsetY}px`;
+        }
+    }
+
+    function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    // Add to the document body
+    document.body.appendChild(menu);
+}
+
 // Modify handleNodeClick to support multi-selection
 function handleNodeClick(event, d) {
-    if (event.shiftKey) {
+    if (event && event.shiftKey) {
         // Add or remove node from selection
         const index = selectedNodes.findIndex(node => node.id === d.id);
         if (index === -1) {
@@ -307,9 +446,9 @@ function handleNodeClick(event, d) {
         // Single selection (clear previous selection)
         selectedNodes = [d];
     }
+
     updateVisualization();
-    updateEntityDetails(d);
-    document.querySelector('.details-overlay').classList.add('show');
+    createNodeMenu(d); // Create a new menu for the selected node
 }
 
 // Update updateVisualization to handle multiple selected nodes
