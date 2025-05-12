@@ -738,6 +738,42 @@ function setupEventHandlers() {
             }, 1200);
         });
     }
+
+    // Add event listener for the illegal fishing filter button
+    const illegalFilterButton = document.getElementById('illegalFilterButton');
+    if (illegalFilterButton) {
+        illegalFilterButton.addEventListener('click', filterIllegalFishingNodes);
+    }
+}
+
+// Extend the illegalFishingKeywords list with additional terms
+const illegalFishingKeywords = [
+    'illegal', 'IUU', 'driftnets', 'transshipment', 'bottom otter trawler', 'catch', 'poached', 'Fishing International',
+    'fraud', 'bribes', 'contraband', 'organized crime', 'guilty', 'officer', 'dark web',
+    'SIMP', 'compliance', 'investigation', 'violation', 'adjusting', 'inconsistencies', 'requested', 'confirmed', 'presumed',
+    'vessel', 'ship', 'trawler', 'shrimper', 'sailboat', 'motor', 'snow crab',
+    'Odisha Sea Dry dock', 'Dark Web Vendor', 'Officer Pleads Guilty', 'Illegal Narcotics'
+];
+
+// Function to filter nodes based on illegal fishing keywords
+function filterIllegalFishingNodes() {
+    const keywords = illegalFishingKeywords.map(keyword => keyword.toLowerCase());
+
+    // Filter nodes containing any of the keywords
+    const filteredNodes = allNodes.filter(node => {
+        const nodeText = `${node.id} ${node.type || ''} ${node.country || ''} ${node.dataset || ''}`.toLowerCase();
+        return keywords.some(keyword => nodeText.includes(keyword));
+    });
+
+    // Filter links connected to the filtered nodes
+    const filteredNodeIds = new Set(filteredNodes.map(node => node.id));
+    const filteredLinks = allLinks.filter(link => 
+        filteredNodeIds.has(link.source.id) && filteredNodeIds.has(link.target.id)
+    );
+
+    currentNodes = filteredNodes;
+    currentLinks = filteredLinks;
+    updateVisualization();
 }
 
 function showNeighborhood(node, depth) {

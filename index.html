@@ -29,9 +29,10 @@
                 <input type="range" id="nodeCountSlider" min="50" max="3750" step="50" value="100">
                 <span id="nodeCount">100 nodes</span>
                 <div style="font-size: 0.95em; color: #555; margin-top: 2px;">
-                    The nodes shown are the <b>top N most connected</b> (highest degree) entities in the dataset. Increasing the slider reveals more nodes, starting with those that have the most relationships.
+                    The nodes shown are the <b>top N most connected</b> (highest degree) entities in the dataset. Increasing the slider reveals more nodes, starting with those that have the most relationships. Can be good to have the slider to the max when searching. It's only lowered by default to improve performance.
                 </div>
             </div>
+
             <div class="filter-sections">
                 <div class="filter-group">
                     <h4>Node Types</h4>
@@ -79,6 +80,12 @@
                     <li><span class="legend-line" style="background-color:#999"></span> Other</li>
                 </ul>
             </div>
+
+            <div class="filter-group">
+                <h4>Flagged Nodes Filter</h4>
+                <button id="illegalFilterButton" style="width: 100%; margin-bottom: 10px;">Show flagged Nodes</button>
+            </div>
+
             <!-- Update the notes section to ensure it is larger by default -->
             <div class="notes-section">
                 <h4>Notes</h4>
