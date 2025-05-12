@@ -294,6 +294,10 @@ function updateVisualization() {
 let selectedNodes = [];
 
 // Function to create a new menu for each selected node with full details and movable functionality
+// Update the createNodeMenu function to stagger window spawn positions
+let menuOffsetX = 400; // Start further to the right
+let menuOffsetY = 100; // Initial vertical offset
+
 function createNodeMenu(node) {
     // Check if a menu for this node already exists
     if (document.getElementById(`menu-${node.id}`)) return;
@@ -303,8 +307,8 @@ function createNodeMenu(node) {
     menu.id = `menu-${node.id}`;
     menu.className = 'node-menu';
     menu.style.position = 'absolute';
-    menu.style.top = `${window.innerHeight / 2 - 150}px`; // Center vertically
-    menu.style.left = `${window.innerWidth / 2 - 150}px`; // Center horizontally
+    menu.style.top = `${menuOffsetY}px`; // Staggered vertical position
+    menu.style.left = `${menuOffsetX}px`; // Staggered horizontal position
     menu.style.width = '300px';
     menu.style.height = '400px'; // Fixed height for scrollability
     menu.style.background = 'white';
@@ -314,6 +318,14 @@ function createNodeMenu(node) {
     menu.style.padding = '10px';
     menu.style.zIndex = 1000;
     menu.style.overflowY = 'auto'; // Enable vertical scrolling
+
+    // Update offsets for the next menu
+    menuOffsetX += 50; // Increase horizontal offset more significantly
+    menuOffsetY += 30;
+
+    // Reset offsets if they go off-screen
+    if (menuOffsetX + 300 > window.innerWidth) menuOffsetX = 100;
+    if (menuOffsetY + 400 > window.innerHeight) menuOffsetY = 50;
 
     // Add header with close and minimize button
     const header = document.createElement('div');
@@ -329,7 +341,6 @@ function createNodeMenu(node) {
 
     const buttonContainer = document.createElement('div');
 
-    // Update the minimize functionality to hide the entire menu content, including the background
     const minimizeButton = document.createElement('button');
     minimizeButton.textContent = '—'; // Line for minimize
     minimizeButton.style.background = 'none';
