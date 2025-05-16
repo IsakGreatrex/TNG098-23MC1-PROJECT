@@ -396,6 +396,7 @@ function createNodeMenu(node) {
                         ${isSource ? 'Has' : 'Is in'} ${relationship} with 
                         <strong>${connectedEntity.id}</strong> 
                         (${connectedEntity.type || 'unknown type'})
+                        ${link.weight ? `<br><span style="color: #666; font-size: 0.9em;">Weight: ${link.weight}</span>` : ''}
                     </li>
                 `;
             }).join('')}
