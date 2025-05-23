@@ -142,18 +142,22 @@ async function loadData() {
     }
 }
 
+// --- ersätt din updateChunkSize ---
 function updateChunkSize(size) {
-    currentChunkSize = size;
+  // Om storlek >= antal noder – ta bort slice helt
+  if (size >= allNodes.length) {
+    currentNodes = allNodes;          // <– laddar ALLA noder
+  } else {
     currentNodes = allNodes.slice(0, size);
-    
-    // Filter links for visible nodes
-    const visibleNodeIds = new Set(currentNodes.map(n => n.id));
-    currentLinks = allLinks.filter(link => 
-        visibleNodeIds.has(link.source.id) && visibleNodeIds.has(link.target.id)
-    );
+  }
 
-    updateVisualization();
+  const visibleIds = new Set(currentNodes.map(n => n.id));
+  currentLinks = allLinks.filter(l =>
+      visibleIds.has(l.source.id) && visibleIds.has(l.target.id));
+
+  updateVisualization();
 }
+
 
 // Throttle function
 function throttle(func, limit) {
@@ -223,20 +227,25 @@ function updateVisualization() {
             .on('drag', dragged)
             .on('end', dragended));
     // Node size: proportional to importance (number of links)
-    nodeEnter.append('circle')
-        .attr('r', d => {
-            // Use logarithmic scaling for node size
-            const minR = 10;
-            const maxR = 40;
-            const base = 1 + (d.neighbors || 1);
-            // Log scale, normalized to [minR, maxR]
-            const logVal = Math.log(base);
-            // Find max log(neighbors) in currentNodes for normalization
-            const maxLog = Math.max(...filteredNodes.map(n => Math.log(1 + (n.neighbors || 1))));
-            const scaled = minR + (maxR - minR) * (logVal / (maxLog || 1));
-            return scaled;
-        })
-        .attr('fill', d => nodeColors[d.type] || '#999');
+    /* ----- LÄGG IN/ERSÄTT I updateVisualization(), PRECIS EFTER nodeEnter definieras ----- */
+
+nodeEnter.append('circle')
+  // Radius: ensamma noder (0 grannar) blir små, övriga får din log-skalning
+  .attr('r', d => {
+      if (d.neighbors === 0) return 6;          // fast värde för “ö-noder”
+      const minR = 10;
+      const maxR = 40;
+      const logVal = Math.log(1 + d.neighbors);
+      const maxLog = Math.max(...filteredNodes.map(n => Math.log(1 + n.neighbors)));
+      return minR + (maxR - minR) * (logVal / (maxLog || 1));
+  })
+  .attr('fill', d => nodeColors[d.type] || '#999')
+  // Röd kant runt noder utan länkar → lätta att upptäcka
+  .attr('stroke', d => d.neighbors === 0 ? '#ff0000' : '#fff')
+  .attr('stroke-width', d => d.neighbors === 0 ? 2 : 1.5);
+
+/* ------------------------------------------------------------------- */
+
     // Ensure node text is appended after the circle to appear above
     nodeEnter.append('text')
         .attr('dx', 0) // Center the text horizontally
@@ -487,7 +496,9 @@ function updateVisualization() {
         if (searchQuery) {
             // Match id, country, dataset, or any string property
             const props = [node.id, node.country, node.dataset, node.type];
-            const match = props.some(p => typeof p === 'string' && p.toLowerCase().includes(searchQuery));
+            // I updateVisualization, byt EN rad:
+const match = props.some(p => String(p).toLowerCase().includes(searchQuery));
+
             if (!match) return false;
         }
         return typeOk;
