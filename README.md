@@ -1,6 +1,10 @@
 # FishEye Network Analysis
 
-This project is an interactive network visualization tool for exploring the VAST Challenge 2023 MC1 dataset. It is built with D3.js and provides a user-friendly interface for filtering, searching, and analyzing complex entity relationships.
+[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-Visit%20Site-blue?logo=github)](https://1ske.github.io/TNG098-23MC1-PROJECT/)
+
+**Live Demo:** [https://1ske.github.io/TNG098-23MC1-PROJECT/](https://1ske.github.io/TNG098-23MC1-PROJECT/)
+
+This project is an interactive network visualization tool for exploring the VAST Challenge 2023 MC1 dataset. It is built with D3.js and provides a user-friendly interface for filtering, searching, and analyzing the dataset.
 
 ## Features
 - **Interactive Force-Directed Graph**: Visualizes entities (nodes) and their relationships (links) with dynamic layout.
